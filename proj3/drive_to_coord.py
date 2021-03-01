@@ -7,6 +7,8 @@ rob = turt.robot()
 ang_error_queue = queue.Queue()
 ang_error_sum = 0
 prev_ang_error = 0
+prev_dist = 0
+dist_sum = 0
 
 def angle_pid(robot, goalX, goalY):
     global ang_error_queue, ang_error_sum, prev_ang_error
@@ -43,19 +45,41 @@ def angle_pid(robot, goalX, goalY):
 def distance(x1, y1, x2, y2):
     return math.sqrt(math.pow(x2-x1, 2) + math.pow(y2-y1, 2))
 
-goalX = int(input("Goal X: "))
-goalY = int(input("Goal Y: "))
+def dist_pid(robot,goalX,goalY):
+    kp = .5
+    ki = .1
+    kd = .1
+    curr = robot.getPositionTup()
+    err = distance(curr[0],curr[1],goalX,goalY)
+    P = kp*err
+    dist_sum = dist_sum + err
+    I = ki * dist_sum
+    D = kd * (err - prev_dist)
+    prev_dist = err
+    return P+I+D
 
-pos = rob.getPositionTup()
-ang_speed = 0
-r = rospy.Rate(1)
-while distance(goalX, goalY, pos[0], pos[1]) > 0.1 and not rospy.is_shutdown():
-    ut = angle_pid(rob, goalX, goalY)
-    print("ut " + str(ut))
-    print()
-    ang_speed = ut
-    rob.drive(ang_speed, 0.1)
+def go_to():
+    goalX = int(input("Goal X: "))
+    goalY = int(input("Goal Y: "))
+
     pos = rob.getPositionTup()
-    r.sleep()
+    ang_speed = 0
+    dist_sum = 0
+    prev_dist = distance(pos[0],pos[1],goalX,goalY)
+    r = rospy.Rate(10)
+    while distance(goalX, goalY, pos[0], pos[1]) > 0.1 and not rospy.is_shutdown():
+        ut = angle_pid(rob, goalX, goalY)
+        print("ut " + str(ut))
+        print()
+        lin_speed = dist_pid(rob,goalX,goalY)
+        print(lin_speed)
+        print()
+        ang_speed = ut
+        rob.drive(ang_speed, lin_speed)
+        pos = rob.getPositionTup()
+        r.sleep()
 
-rob.stop()
+    rob.stop()
+
+go_to()
+go_to()
