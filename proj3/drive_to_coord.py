@@ -23,6 +23,10 @@ def angle_pid(robot, goalX, goalY):
     print("angle to goal " + str(ang_to_goal))
     print("yaw " + str(yaw))
     ang_error = ang_to_goal - yaw
+    while ang_error>math.pi:
+        ang_error -= math.pi
+    while ang_error < -1*math.pi:
+        ang_error += math.pi
     print("error " + str(ang_error))
     kp = 0.2
     ki = 0.01
