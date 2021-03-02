@@ -9,6 +9,7 @@ ang_error_sum = 0
 prev_ang_error = 0
 prev_dist = 0
 dist_sum = 0
+dist_queue = []
 
 def angle_pid(robot, goalX, goalY):
     global ang_error_queue, ang_error_sum, prev_ang_error
@@ -46,17 +47,24 @@ def distance(x1, y1, x2, y2):
     return math.sqrt(math.pow(x2-x1, 2) + math.pow(y2-y1, 2))
 
 def dist_pid(robot,goalX,goalY):
-    kp = .5
-    ki = .1
-    kd = .1
+    global prev_dist, dist_queue, dist_sum
+    kp = .1
+    ki = 0.001
+    kd = 0.01
     curr = robot.getPositionTup()
     err = distance(curr[0],curr[1],goalX,goalY)
     P = kp*err
-    dist_sum = dist_sum + err
+    dist_queue.append(err)
+    dist_sum += err
+    if len(dist_queue)>5:
+        dist_sum -= dist_queue.pop(0)
     I = ki * dist_sum
     D = kd * (err - prev_dist)
     prev_dist = err
-    return P+I+D
+    Ut = P+I+D
+    if Ut > .6:
+        return .6
+    return Ut
 
 def go_to():
     goalX = int(input("Goal X: "))
@@ -65,6 +73,7 @@ def go_to():
     pos = rob.getPositionTup()
     ang_speed = 0
     dist_sum = 0
+    dist_queue = []
     prev_dist = distance(pos[0],pos[1],goalX,goalY)
     r = rospy.Rate(10)
     while distance(goalX, goalY, pos[0], pos[1]) > 0.1 and not rospy.is_shutdown():
@@ -82,4 +91,7 @@ def go_to():
     rob.stop()
 
 go_to()
+ang_error_queue = queue.Queue()
+ang_error_sum = 0
+prev_ang_error = 0
 go_to()
