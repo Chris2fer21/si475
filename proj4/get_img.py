@@ -51,7 +51,7 @@ if color == 'purple':
 
 if color == 'red':
     light = (0,15,20)
-    dark = (10,255,235)
+    dark = (7,255,235)
 
 if color == 'yellow':
     light = (25,15,20)
