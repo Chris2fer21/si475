@@ -58,8 +58,8 @@ if color == 'yellow':
     dark = (40,255,235)
 
 if color == 'blue':
-    light = (100,15,20)
-    dark = (130,255,235)
+    light = (110,15,80)
+    dark = (135,255,190)
 
 r = robot()
 
