@@ -97,10 +97,12 @@ def move(rob,room,particles):
   TorD=input("(T)urn, (D)rive, or (Q)uit? ")
   if TorD=='T' or TorD=='t':
     angle=float(input(" Angle? "))
-    #TODO
+    for part in particles:
+        part.turn(angle)
   elif TorD=='D' or TorD=='d':
     distance=float(input(' Distance? '))
-    #TODO
+    for part in particles:
+        part.drive(distance)
   elif TorD=='Q' or TorD=='q':
     exit()
 
@@ -109,7 +111,7 @@ def observe(rob,room,particles):
   Should take an observation from the robot and perform particle resampling.
   Return the list of new particles.
   '''
-  #TODO
+  
 
 def main():
   N=10000
